@@ -330,7 +330,7 @@
 
                 <!-- Country/Services Section -->
                 <section class="row mt-4">
-                    @yield('country')
+                    @yield('serviceCharts')
                 </section>
 
                 <!-- Additional Content -->

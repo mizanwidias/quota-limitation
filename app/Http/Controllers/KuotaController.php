@@ -9,38 +9,42 @@ class KuotaController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    private function getPakets()
     {
-        return view('paket-kuota.index', [
-            'title' => 'Kuota - Hyperlink',
-        ]);
-    }
-
-    public function pilih($id)
-    {
-        // Data paket bisa kamu ambil dari array yang sama di index
-        $pakets = [
+        return [
             [
                 'id' => 1,
                 'nama' => 'Paket Silver',
                 'deskripsi' => 'Internet cepat untuk kebutuhan harian.',
-                'kuota' => '50 GB',
-                'kecepatan' => '10 Mbps',
+                'kuota' => '20 GB',
+                'kecepatan' => '15 Mbps',
                 'masa_aktif' => '30 Hari',
-                'harga' => 100000,
+                'harga' => 50000,
                 'warna' => 'primary',
                 'ikon' => 'bi-wifi',
+                'fitur' => [
+                    'Browsing Lancar',
+                    'Streaming SD',
+                    'Social Media'
+                ],
+                'badge' => null
             ],
             [
                 'id' => 2,
                 'nama' => 'Paket Gold',
                 'deskripsi' => 'Untuk streaming & gaming tanpa batas.',
-                'kuota' => '100 GB',
-                'kecepatan' => '20 Mbps',
+                'kuota' => '50 GB',
+                'kecepatan' => '25 Mbps',
                 'masa_aktif' => '30 Hari',
-                'harga' => 180000,
+                'harga' => 100000,
                 'warna' => 'success',
                 'ikon' => 'bi-lightning-fill',
+                'fitur' => [
+                    'Streaming HD',
+                    'Gaming Online',
+                    'Video Call HD'
+                ],
+                'badge' => 'Popular'
             ],
             [
                 'id' => 3,
@@ -49,12 +53,50 @@ class KuotaController extends Controller
                 'kuota' => 'Unlimited',
                 'kecepatan' => '50 Mbps',
                 'masa_aktif' => '30 Hari',
-                'harga' => 250000,
+                'harga' => 180000,
                 'warna' => 'warning',
                 'ikon' => 'bi-star-fill',
+                'fitur' => [
+                    'Streaming 4K',
+                    'Download Unlimited',
+                    'Priority Support'
+                ],
+                'badge' => 'Best Value'
+            ],
+            [
+                'id' => 4,
+                'nama' => 'Paket Diamond',
+                'deskripsi' => 'Kecepatan super untuk professional.',
+                'kuota' => 'Unlimited',
+                'kecepatan' => '100 Mbps',
+                'masa_aktif' => '30 Hari',
+                'harga' => 250000,
+                'warna' => 'danger',
+                'ikon' => 'bi-gem',
+                'fitur' => [
+                    'Ultra Fast Speed',
+                    'Premium Support 24/7',
+                    'Free Router'
+                ],
+                'badge' => 'Premium'
             ],
         ];
+    }
 
+    public function index()
+    {
+        $pakets = $this->getPakets();
+
+        return view('paket-kuota.index', [
+            'title' => 'Kuota - Hyperlink',
+            'pakets' => $pakets,
+        ]);
+    }
+
+    public function pilih($id)
+    {
+        $pakets = $this->getPakets();
+        
         // Cari paket berdasarkan ID
         $paket = collect($pakets)->firstWhere('id', (int)$id);
 
@@ -65,7 +107,31 @@ class KuotaController extends Controller
         return view('paket-kuota.pilih', [
             'title' => 'Pilih Paket - ' . $paket['nama'],
             'paket' => $paket,
+            'pakets' => $pakets, // kirim semua paket untuk comparison
         ]);
+    }
+
+    public function proses(Request $request, $id)
+    {
+        $request->validate([
+            'nama' => 'required|string|max:255',
+            'email' => 'required|email',
+            'telepon' => 'required|string|max:15',
+            'alamat' => 'required|string',
+        ]);
+
+        $pakets = $this->getPakets();
+        $paket = collect($pakets)->firstWhere('id', (int)$id);
+
+        if (!$paket) {
+            return redirect()->route('kuota')
+                ->with('error', 'Paket tidak ditemukan.');
+        }
+
+        // Di sini bisa simpan ke database
+        // Untuk sekarang redirect dengan success message
+        return redirect()->route('kuota')
+            ->with('success', 'Pemesanan paket ' . $paket['nama'] . ' berhasil! Kami akan menghubungi Anda segera.');
     }
 
 

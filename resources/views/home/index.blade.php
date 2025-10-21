@@ -15,15 +15,18 @@
 </div>
 @endsection
 
-@section('country')
+@section('serviceCharts')
 <div class="row g-3">
     <div class="col-12">
         <div class="card shadow-sm border-0 rounded-4">
             <div class="card-header bg-transparent border-0 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
-                <h5 class="fw-bold mb-0">TOP Services (AS)</h5>
-                <select id="timeRange" class="form-select form-select-sm w-auto">
-                    <option value="h">1 Jam</option>
-                    <option value="d">1 Hari</option>
+                <h5 class="fw-bold mb-0">
+                    <i class="bi bi-graph-up-arrow me-2 text-primary"></i>
+                    TOP Services (AS)
+                </h5>
+                <select id="timeRange" class="form-select form-select-sm w-auto shadow-sm">
+                    <option value="h" selected>1 Jam</option>
+                    <option value="d">Hari Ini</option>
                     <option value="w">1 Minggu</option>
                     <option value="m">1 Bulan</option>
                     <option value="y">1 Tahun</option>
@@ -31,342 +34,284 @@
             </div>
 
             <div class="card-body">
-                <div style="position: relative;">
-                    <div id="chartLoading" class="loading-overlay">
-                        <div class="spinner"></div>
+                <div style="position: relative; min-height: 350px;">
+                    <div id="chartLoading" class="loading-overlay" style="display: none;">
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                            <div class="spinner-border text-primary mb-3" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p class="text-muted">Memuat data...</p>
+                        </div>
                     </div>
                     <canvas id="topServiceChart" height="120"></canvas>
                 </div>
-                <hr>
+
+                <hr class="my-4">
+
                 <div id="serviceList">
-                    @include('home.partials.service-list', ['services' => $services])
+                    @forelse ($services as $index => $service)
+                        <div class="service-item d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light bg-opacity-50 hover-highlight">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                <div class="service-rank me-3">
+                                    <span class="badge bg-primary rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                        {{ $index + 1 }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div class="fw-semibold text-dark mb-1">
+                                        <i class="bi bi-hdd-network text-primary me-2"></i>
+                                        {{ $service['asn'] ?? 'Unknown ASN' }}
+                                    </div>
+                                    <small class="text-muted">
+                                        <i class="bi bi-building me-1"></i>
+                                        {{ $service['name'] ?? 'Unknown Provider' }}
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <div class="fw-bold text-primary fs-6">
+                                    {{ formatBytes($service['total_bytes']) }}
+                                </div>
+                                <small class="text-muted">
+                                    {{ number_format($service['percentage'] ?? 0, 1) }}%
+                                </small>
+                            </div>
+                        </div>
+                    @empty
+                        <div class="text-center py-5">
+                            <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+                            <p class="text-muted mb-0">Tidak ada data layanan yang tersedia.</p>
+                        </div>
+                    @endforelse
                 </div>
             </div>
         </div>
     </div>
 </div>
-@endsection
 
-@push('styles')
 <style>
-    .loading-overlay {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(255, 255, 255, 0.7);
-        border-radius: 8px;
-        align-items: center;
-        justify-content: center;
-        z-index: 10;
-    }
-
-    .loading-overlay.active {
-        display: flex;
-    }
-
-    .spinner {
-        width: 30px;
-        height: 30px;
-        border: 3px solid #e2e8f0;
-        border-top: 3px solid #667eea;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
-
-    /* Enhanced service list */
-    .service-item-enhanced {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid #f0f0f0;
-        transition: all 0.2s ease;
-    }
-
-    .service-item-enhanced:last-child {
-        border-bottom: none;
-    }
-
-    .service-item-enhanced:hover {
-        background: #f9f9f9;
-        padding-left: 8px;
-        padding-right: 8px;
-        margin-left: -8px;
-        margin-right: -8px;
-        border-radius: 8px;
-    }
-
-    .service-left {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        flex: 1;
-        min-width: 0;
-    }
-
-    .service-rank {
-        min-width: 32px;
-        height: 32px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-        font-weight: 700;
-        font-size: 0.85em;
-        color: white;
-        flex-shrink: 0;
-    }
-
-    .rank-1 {
-        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-        color: #333;
-    }
-
-    .rank-2 {
-        background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 100%);
-    }
-
-    .rank-3 {
-        background: linear-gradient(135deg, #cd7f32 0%, #e8a76a 100%);
-    }
-
-    .rank-other {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    }
-
-    .service-info-text {
-        min-width: 0;
-    }
-
-    .service-name {
-        font-weight: 600;
-        color: #2d3748;
-        font-size: 0.95em;
-        margin-bottom: 2px;
-    }
-
-    .service-meta {
-        font-size: 0.85em;
-        color: #a0aec0;
-        display: flex;
-        gap: 8px;
-        flex-wrap: wrap;
-    }
-
-    .service-usage {
-        text-align: right;
-        flex-shrink: 0;
-    }
-
-    .usage-value {
-        font-weight: 700;
-        color: #667eea;
-        font-size: 1em;
-    }
-
-    .usage-label {
-        font-size: 0.8em;
-        color: #a0aec0;
-    }
-
-    @media (max-width: 768px) {
-        .service-item-enhanced {
-            flex-wrap: wrap;
-        }
-
-        .service-meta {
-            width: 100%;
-        }
-    }
-</style>
-@endpush
-
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-let chartInstance;
-let services = @json($services);
-
-// Utility function untuk format bytes
-function formatBytes(bytes) {
-    if (!bytes || bytes === 0) return '0 B';
-    const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-    let i = 0;
-    while (bytes >= 1024 && i < units.length - 1) {
-        bytes /= 1024;
-        i++;
-    }
-    return bytes.toFixed(2) + ' ' + units[i];
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    border-radius: 0.5rem;
 }
 
-// Render chart dari service data
-function renderChart(data) {
-    if (!data || data.length === 0) {
-        console.warn('No data to render');
-        return;
+.hover-highlight {
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.hover-highlight:hover {
+    background-color: rgba(13, 110, 253, 0.05) !important;
+    border-color: rgba(13, 110, 253, 0.2);
+    transform: translateX(5px);
+}
+
+.service-rank .badge {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+#timeRange {
+    border-radius: 0.5rem;
+    border-color: #dee2e6;
+    transition: all 0.2s ease;
+}
+
+#timeRange:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+</style>
+
+<script>
+let serviceChart = null;
+
+// Initialize chart
+function initServiceChart(data) {
+    const ctx = document.getElementById('topServiceChart');
+    if (!ctx) return;
+
+    // Destroy existing chart
+    if (serviceChart) {
+        serviceChart.destroy();
     }
 
-    const ctx = document.getElementById('topServiceChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
-
-    // Extract data dari service array
-    const labels = data.map(s => s.asn || 'Unknown');
-    const chartData = data.map(s => s.total_bytes || 0);
-    
+    // Prepare data
+    const labels = data.map(item => item.asn || 'Unknown');
+    const bytes = data.map(item => item.total_bytes || 0);
     const colors = [
-        'rgba(102, 126, 234, 0.8)',
-        'rgba(118, 75, 162, 0.8)',
-        'rgba(244, 63, 94, 0.8)',
-        'rgba(255, 159, 64, 0.8)',
-        'rgba(75, 192, 192, 0.8)',
-        'rgba(153, 102, 255, 0.8)',
-        'rgba(255, 206, 86, 0.8)',
-        'rgba(201, 203, 207, 0.8)',
-        'rgba(54, 162, 235, 0.8)',
-        'rgba(255, 99, 132, 0.8)'
+        '#0d6efd', '#6610f2', '#6f42c1', '#d63384', '#dc3545',
+        '#fd7e14', '#ffc107', '#20c997', '#0dcaf0', '#198754'
     ];
 
-    const backgroundColors = colors.slice(0, chartData.length);
-
-    try {
-        chartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Penggunaan Kuota',
-                    data: chartData,
-                    backgroundColor: backgroundColors,
+    serviceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Traffic Usage',
+                data: bytes,
+                backgroundColor: colors.slice(0, labels.length),
+                borderColor: colors.slice(0, labels.length),
+                borderWidth: 0,
+                borderRadius: 8,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 12,
                     borderRadius: 8,
-                    borderSkipped: false,
-                }]
+                    titleFont: {
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        size: 13
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            return 'Traffic: ' + formatBytes(context.parsed.y);
+                        }
+                    }
+                }
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                        padding: 12,
-                        borderRadius: 8,
-                        titleFont: { size: 13, weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        callbacks: {
-                            label: function(context) {
-                                return formatBytes(context.parsed.y);
-                            }
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return formatBytes(value);
+                        },
+                        font: {
+                            size: 11
                         }
                     }
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return formatBytes(value);
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(200, 200, 200, 0.1)'
-                        }
+                x: {
+                    grid: {
+                        display: false
                     },
-                    x: {
-                        grid: { display: false }
+                    ticks: {
+                        font: {
+                            size: 11
+                        }
                     }
                 }
             }
-        });
+        }
+    });
+}
+
+// Format bytes helper
+function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+// Load data based on time range
+async function loadServiceData(timeRange) {
+    const loadingEl = document.getElementById('chartLoading');
+    if (loadingEl) loadingEl.style.display = 'flex';
+
+    try {
+        // Replace with your actual API endpoint
+        const response = await fetch(`/api/top-services?range=${timeRange}`);
+        const data = await response.json();
+        
+        // Update chart
+        if (data.services && data.services.length > 0) {
+            initServiceChart(data.services);
+            updateServiceList(data.services);
+        }
     } catch (error) {
-        console.error('Chart rendering error:', error);
+        console.error('Error loading service data:', error);
+    } finally {
+        if (loadingEl) loadingEl.style.display = 'none';
     }
 }
 
-// Update data berdasarkan time range
-function updateData(range) {
-    const loading = document.getElementById('chartLoading');
-    if (loading) loading.classList.add('active');
+// Update service list
+function updateServiceList(services) {
+    const listEl = document.getElementById('serviceList');
+    if (!listEl || !services.length) return;
 
-    console.log('Fetching data for range:', range);
+    const total = services.reduce((sum, s) => sum + (s.total_bytes || 0), 0);
     
-    fetch(`{{ route('home.top-services') }}?range=${range}`)
-        .then(res => {
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            return res.json();
-        })
-        .then(res => {
-            console.log('Response:', res);
-            
-            if (res.success && Array.isArray(res.data)) {
-                services = res.data;
-                renderChart(services);
-                updateServiceList(services);
-            } else {
-                console.error('Invalid response format:', res);
-                updateServiceList([]);
-            }
-        })
-        .catch(err => {
-            console.error('Error fetching data:', err);
-            updateServiceList([]);
-        })
-        .finally(() => {
-            if (loading) loading.classList.remove('active');
-        });
-}
-
-// Update service list HTML
-function updateServiceList(data) {
-    let html = '';
-    
-    if (data && data.length > 0) {
-        data.forEach((s, idx) => {
-            const rankClass = idx <= 2 ? `rank-${idx + 1}` : 'rank-other';
-            html += `
-                <div class="service-item-enhanced">
-                    <div class="service-left">
-                        <div class="service-rank ${rankClass}">
-                            ${idx + 1}
-                        </div>
-                        <div class="service-info-text">
-                            <div class="service-name">${s.asn || 'Unknown ASN'}</div>
-                            <div class="service-meta">
-                                <span>${s.name || 'Unknown'}</span>
-                                <span>🌍 ${s.country || 'N/A'}</span>
-                            </div>
-                        </div>
+    listEl.innerHTML = services.map((service, index) => {
+        const percentage = total > 0 ? ((service.total_bytes / total) * 100).toFixed(1) : 0;
+        return `
+            <div class="service-item d-flex justify-content-between align-items-center mb-3 p-3 rounded-3 bg-light bg-opacity-50 hover-highlight">
+                <div class="d-flex align-items-center flex-grow-1">
+                    <div class="service-rank me-3">
+                        <span class="badge bg-primary rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            ${index + 1}
+                        </span>
                     </div>
-                    <div class="service-usage">
-                        <div class="usage-value">${formatBytes(s.total_bytes)}</div>
+                    <div>
+                        <div class="fw-semibold text-dark mb-1">
+                            <i class="bi bi-hdd-network text-primary me-2"></i>
+                            ${service.asn || 'Unknown ASN'}
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-building me-1"></i>
+                            ${service.name || 'Unknown Provider'}
+                        </small>
                     </div>
                 </div>
-            `;
-        });
-    } else {
-        html = '<p class="text-muted text-center py-3">Tidak ada data layanan yang tersedia.</p>';
-    }
-    
-    document.getElementById('serviceList').innerHTML = html;
+                <div class="text-end">
+                    <div class="fw-bold text-primary fs-6">
+                        ${formatBytes(service.total_bytes)}
+                    </div>
+                    <small class="text-muted">
+                        ${percentage}%
+                    </small>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
-// Event listener
-document.getElementById('timeRange').addEventListener('change', function(e) {
-    updateData(e.target.value);
-});
-
-// Initial render
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    if (services && services.length > 0) {
-        renderChart(services);
-        updateServiceList(services);
+    // Initialize chart with existing data
+    const initialData = @json($services ?? []);
+    if (initialData.length > 0) {
+        initServiceChart(initialData);
+    }
+
+    // Time range change handler
+    const timeRangeSelect = document.getElementById('timeRange');
+    if (timeRangeSelect) {
+        timeRangeSelect.addEventListener('change', function() {
+            loadServiceData(this.value);
+        });
     }
 });
 </script>
-@endpush
+@endsection
+

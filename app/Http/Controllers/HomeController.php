@@ -27,7 +27,7 @@ class HomeController extends Controller
 
     public function getTopServices(Request $request)
     {
-        $range = $request->get('range', 'h');
+        $range = $request->get('average', 'h');
         $services = $this->fetchTopServices($range);
 
         return response()->json([
