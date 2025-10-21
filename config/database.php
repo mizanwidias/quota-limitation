@@ -73,7 +73,7 @@ return [
             'options'  => [
                 'timeout' => 10,
             ],
-        ],        
+        ],
 
         'pgsql' => [
             'driver' => 'pgsql',
@@ -105,6 +105,23 @@ return [
             // 'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
         ],
 
+        'radius' => [
+            'driver' => 'mysql',
+            'url' => env('DB_RADIUS_URL'),
+            'host' => env('DB_RADIUS_HOST', '69.69.69.2'),
+            'port' => env('DB_RADIUS_PORT', '3308'),
+            'database' => env('DB_RADIUS_DATABASE', 'radius'),
+            'username' => env('DB_RADIUS_USERNAME', 'laravel'),
+            'password' => env('DB_RADIUS_PASSWORD', 'laravelpass'),
+            'unix_socket' => env('DB_RADIUS_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ],
+        
     ],
 
     /*
@@ -137,7 +154,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
         ],
 
         'default' => [
