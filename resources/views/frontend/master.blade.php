@@ -204,7 +204,7 @@
                 <div class="sidebar-header">
                     <div class="d-flex justify-content-between">
                         <div class="logo">
-                            <a href="{{ route('home') }}"><img src="{{ asset('images/logo/logo.png') }}" alt="Logo"></a>
+                            <a href="{{ route('home') }}"><img src="{{ asset('images/logo/hyperlink-logo.jpg') }}" alt="Logo" style="width: auto; height: 80px; object-fit: cover; margin-left: 60px; margin-top: -20px; margin-bottom: -20px"></a>
                         </div>
                         <div class="toggler">
                             <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
@@ -251,75 +251,7 @@
                 <section class="row">
                     <div class="col-12">
                         <!-- Stats Cards -->
-                        <div class="stats-container">
-                            <!-- User Profile Card -->
-                            <div class="card stat-card shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="avatar-wrapper position-relative">
-                                            <img src="{{ asset('images/faces/1.jpg') }}" alt="John Duck" class="rounded-circle" width="60" height="60">
-                                            <div class="status-badge"></div>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="stat-label">Profil Pengguna</div>
-                                            <h6 class="stat-value mb-1">John Duck</h6>
-                                            <small class="stat-meta">
-                                                <i class="bi bi-telephone"></i> 08080808080
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Uptime Card -->
-                            <div class="card stat-card shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div class="stat-icon" style="background: var(--primary-gradient); color: white;">
-                                            <i class="bi bi-gear-fill"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="stat-label">Uptime Perangkat</div>
-                                            <h6 class="stat-value">1D 1H 23M</h6>
-                                            <small class="stat-meta">
-                                                <i class="bi bi-check-circle text-success"></i>
-                                                <span class="text-success fw-semibold">Stabil</span>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Subscription Duration Card -->
-                            <div class="card stat-card shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="stat-label">Masa Aktif Langganan</div>
-                                    <h6 class="stat-value mb-2">18 Hari</h6>
-                                    <div class="progress-custom">
-                                        <div class="progress-bar" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                    <div class="progress-label">
-                                        <span>Progres</span>
-                                        <span class="fw-bold">60% dari 30 hari</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Total Usage Card -->
-                            <div class="card stat-card shadow-sm border-0">
-                                <div class="card-body">
-                                    <div class="stat-label">📊 Total Pemakaian Kuota</div>
-                                    <h6 class="stat-value mb-2">699 GB</h6>
-                                    <div class="progress-custom">
-                                        <div class="progress-bar bg-danger" role="progressbar" style="width: 87.4%;" aria-valuenow="87.4" aria-valuemin="0" aria-valuemax="100"></div>
-                                    </div>
-                                    <div class="progress-label">
-                                        <span>Kapasitas</span>
-                                        <span class="fw-bold text-danger">87.4% dari 800 GB</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @yield('card')
 
                         <div class="section-divider"></div>
 
@@ -335,6 +267,37 @@
 
                 <!-- Additional Content -->
                 @yield('content')
+                <!-- Info Banner -->
+                <div class="row mt-5">
+                    <div class="col-12">
+                        <div class="card border-0 bg-light rounded-4">
+                            <div class="card-body text-center py-4">
+                                <h5 class="fw-bold mb-3">
+                                    <i class="bi bi-info-circle text-primary me-2"></i>
+                                    Informasi Penting
+                                </h5>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
+                                        <small class="fw-semibold">Aman & Terpercaya</small>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
+                                        <small class="fw-semibold d-block mb-2">Customer Service 24/7</small>
+                                        <a href="https://wa.me/6289699405414" class="btn btn-success btn-sm rounded-pill" target="_blank">
+                                            <i class="bi bi-whatsapp me-1"></i>
+                                            Chat WhatsApp
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <i class="bi bi-lightning-charge text-warning fs-3 mb-2 d-block"></i>
+                                        <small class="fw-semibold">Aktivasi Instan</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <footer>

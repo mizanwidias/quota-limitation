@@ -1,5 +1,9 @@
 @extends('frontend.master')
 
+@section('card')
+    @include('frontend.card')
+@endsection
+
 @section('chart')
 <div class="row">
     <div class="col-12">
@@ -25,8 +29,8 @@
                     TOP Services (AS)
                 </h5>
                 <select id="timeRange" class="form-select form-select-sm w-auto shadow-sm">
-                    <option value="h" selected>1 Jam</option>
-                    <option value="d">Hari Ini</option>
+                    <option value="h">1 Jam</option>
+                    <option value="d" selected>1 Hari</option>
                     <option value="w">1 Minggu</option>
                     <option value="m">1 Bulan</option>
                     <option value="y">1 Tahun</option>

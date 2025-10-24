@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\GeoHelper;
+use App\Services\RadacctService;
 use ClickHouseDB\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -16,18 +17,53 @@ class HomeController extends Controller
      */
     public function index()
     {
-        // Default tampil 1 jam terakhir
+        // Default tampil 1 jam terakhir dari ClickHouse
         $services = $this->fetchTopServices('h');
+
+        // Ambil data kuota user dari radius
+        $username = auth()->user()->username ?? 'demo'; // sesuaikan
+        $limitKuotaGB = 800; // contoh batas kuota (bisa ambil dari DB nanti)
+
+        $usage = RadacctService::getUsage($username, date('Y'), date('m'));
+
+        // Ubah hasil pemakaian jadi GB (angka murni)
+        $totalUsageBytes = self::toBytes($usage['total']);
+        $totalUsageGB = round($totalUsageBytes / pow(1024, 3), 2);
+
+        // Hitung persentase
+        $persentase = min(($totalUsageGB / $limitKuotaGB) * 100, 100);
 
         return view('home.index', [
             'title' => 'Dashboard - Hyperlink',
             'services' => $services,
+            'usage' => $usage,
+            'limit' => $limitKuotaGB,
+            'persentase' => $persentase,
         ]);
+    }
+
+    // Tambahkan helper kecil di bawah controller:
+    private static function toBytes($value)
+    {
+        $unit = strtoupper(substr(trim($value), -2));
+        $number = floatval($value);
+        switch ($unit) {
+            case 'KB':
+                return $number * pow(1024, 1);
+            case 'MB':
+                return $number * pow(1024, 2);
+            case 'GB':
+                return $number * pow(1024, 3);
+            case 'TB':
+                return $number * pow(1024, 4);
+            default:
+                return $number;
+        }
     }
 
     public function getTopServices(Request $request)
     {
-        $range = $request->get('average', 'h');
+        $range = $request->get('range', 'h');
         $services = $this->fetchTopServices($range);
 
         return response()->json([

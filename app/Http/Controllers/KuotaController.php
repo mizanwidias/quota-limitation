@@ -2,184 +2,93 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\RadacctService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class KuotaController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Ambil list paket langsung dari RADIUS (misalnya dari tabel radgroupreply atau radgroupcheck)
      */
-    private function getPakets()
+    private function getPaketsFromRadius()
     {
-        return [
-            [
-                'id' => 1,
-                'nama' => 'Paket Silver',
-                'deskripsi' => 'Internet cepat untuk kebutuhan harian.',
-                'kuota' => '20 GB',
-                'kecepatan' => '15 Mbps',
+        // Contoh ambil dari radgroupreply berdasarkan GroupName unik
+        $groups = DB::connection('radius')
+            ->table('radgroupreply')
+            ->select('groupname')
+            ->distinct()
+            ->get();
+
+        $pakets = [];
+
+        foreach ($groups as $i => $group) {
+            // Ambil parameter penting untuk tiap group
+            $attrs = DB::connection('radius')
+                ->table('radgroupreply')
+                ->where('groupname', $group->groupname)
+                ->pluck('value', 'attribute');
+
+            $pakets[] = [
+                'id' => $i + 1,
+                'nama' => ucfirst($group->groupname),
+                'deskripsi' => $attrs['WISPr-Bandwidth-Max-Down'] ?? 'Paket internet',
+                'kuota' => $attrs['Max-Daily-Session'] ?? 'Unlimited',
+                'kecepatan' => isset($attrs['WISPr-Bandwidth-Max-Down'])
+                    ? round($attrs['WISPr-Bandwidth-Max-Down'] / 1000000) . ' Mbps'
+                    : 'N/A',
                 'masa_aktif' => '30 Hari',
-                'harga' => 50000,
-                'warna' => 'primary',
-                'ikon' => 'bi-wifi',
-                'fitur' => [
-                    'Browsing Lancar',
-                    'Streaming SD',
-                    'Social Media'
-                ],
-                'badge' => null
-            ],
-            [
-                'id' => 2,
-                'nama' => 'Paket Gold',
-                'deskripsi' => 'Untuk streaming & gaming tanpa batas.',
-                'kuota' => '50 GB',
-                'kecepatan' => '25 Mbps',
-                'masa_aktif' => '30 Hari',
-                'harga' => 100000,
-                'warna' => 'success',
-                'ikon' => 'bi-lightning-fill',
-                'fitur' => [
-                    'Streaming HD',
-                    'Gaming Online',
-                    'Video Call HD'
-                ],
-                'badge' => 'Popular'
-            ],
-            [
-                'id' => 3,
-                'nama' => 'Paket Platinum',
-                'deskripsi' => 'Performa maksimal untuk semua kebutuhan.',
-                'kuota' => 'Unlimited',
-                'kecepatan' => '50 Mbps',
-                'masa_aktif' => '30 Hari',
-                'harga' => 180000,
-                'warna' => 'warning',
-                'ikon' => 'bi-star-fill',
-                'fitur' => [
-                    'Streaming 4K',
-                    'Download Unlimited',
-                    'Priority Support'
-                ],
-                'badge' => 'Best Value'
-            ],
-            [
-                'id' => 4,
-                'nama' => 'Paket Diamond',
-                'deskripsi' => 'Kecepatan super untuk professional.',
-                'kuota' => 'Unlimited',
-                'kecepatan' => '100 Mbps',
-                'masa_aktif' => '30 Hari',
-                'harga' => 250000,
-                'warna' => 'danger',
-                'ikon' => 'bi-gem',
-                'fitur' => [
-                    'Ultra Fast Speed',
-                    'Premium Support 24/7',
-                    'Free Router'
-                ],
-                'badge' => 'Premium'
-            ],
-        ];
+                'harga' => rand(50000, 250000), // Bisa ambil dari tabel paket tersendiri nanti
+                'warna' => ['primary', 'success', 'warning', 'danger'][($i % 4)],
+                'ikon' => ['bi-wifi', 'bi-lightning-fill', 'bi-star-fill', 'bi-gem'][($i % 4)],
+                'badge' => $i == 1 ? 'Popular' : null
+            ];
+        }
+
+        return $pakets;
     }
 
     public function index()
     {
-        $pakets = $this->getPakets();
+        $pakets = $this->getPaketsFromRadius();
+
+        $username = auth()->user()->username ?? 'demo';
+        $limitKuotaGB = 50; // default kuota
+        $usage = RadacctService::getUsage($username, date('Y'), date('m'));
+
+        $totalUsageGB = isset($usage['total_bytes'])
+            ? round($usage['total_bytes'] / pow(1024, 3), 2)
+            : 0;
+
+        $persentase = $limitKuotaGB > 0
+            ? min(($totalUsageGB / $limitKuotaGB) * 100, 100)
+            : 0;
+
+        // Cek paket aktif user
+        $activeGroup = DB::connection('radius')
+            ->table('radusergroup')
+            ->where('username', $username)
+            ->value('groupname');
 
         return view('paket-kuota.index', [
-            'title' => 'Kuota - Hyperlink',
+            'title' => 'Paket Kuota Internet',
             'pakets' => $pakets,
+            'usage' => $usage,
+            'limit' => $limitKuotaGB,
+            'persentase' => $persentase,
+            'activeGroup' => $activeGroup,
         ]);
     }
 
     public function pilih($id)
     {
-        $pakets = $this->getPakets();
-        
-        // Cari paket berdasarkan ID
+        $pakets = $this->getPaketsFromRadius();
         $paket = collect($pakets)->firstWhere('id', (int)$id);
 
         if (!$paket) {
             abort(404, 'Paket tidak ditemukan.');
         }
 
-        return view('paket-kuota.pilih', [
-            'title' => 'Pilih Paket - ' . $paket['nama'],
-            'paket' => $paket,
-            'pakets' => $pakets, // kirim semua paket untuk comparison
-        ]);
-    }
-
-    public function proses(Request $request, $id)
-    {
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|email',
-            'telepon' => 'required|string|max:15',
-            'alamat' => 'required|string',
-        ]);
-
-        $pakets = $this->getPakets();
-        $paket = collect($pakets)->firstWhere('id', (int)$id);
-
-        if (!$paket) {
-            return redirect()->route('kuota')
-                ->with('error', 'Paket tidak ditemukan.');
-        }
-
-        // Di sini bisa simpan ke database
-        // Untuk sekarang redirect dengan success message
-        return redirect()->route('kuota')
-            ->with('success', 'Pemesanan paket ' . $paket['nama'] . ' berhasil! Kami akan menghubungi Anda segera.');
-    }
-
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return view('paket-kuota.pilih', compact('paket'));
     }
 }

@@ -1,5 +1,9 @@
 @extends('frontend.master')
 
+@section('card')
+    @include('frontend.card')
+@endsection
+
 @section('content')
 <div class="container py-5">
     <!-- Alert Messages -->
@@ -65,21 +69,6 @@
                             </li>
                         </ul>
 
-                        <!-- Fitur -->
-                        @if(isset($paket['fitur']))
-                            <div class="mb-3">
-                                <hr class="my-3">
-                                <div class="text-start">
-                                    @foreach($paket['fitur'] as $fitur)
-                                        <small class="d-block mb-1">
-                                            <i class="bi bi-check-circle-fill text-success me-1"></i>
-                                            {{ $fitur }}
-                                        </small>
-                                    @endforeach
-                                </div>
-                            </div>
-                        @endif
-
                         <!-- Spacer untuk push button ke bawah -->
                         <div class="mt-auto">
                             <!-- Harga -->
@@ -105,35 +94,6 @@
                 </div>
             </div>
         @endforelse
-    </div>
-
-    <!-- Info Banner -->
-    <div class="row mt-5">
-        <div class="col-12">
-            <div class="card border-0 bg-light rounded-4">
-                <div class="card-body text-center py-4">
-                    <h5 class="fw-bold mb-3">
-                        <i class="bi bi-info-circle text-primary me-2"></i>
-                        Informasi Penting
-                    </h5>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
-                            <small class="fw-semibold">Aman & Terpercaya</small>
-                        </div>
-                        <div class="col-md-4">
-                            <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
-                            <a href="https://wa.me/6289699405414">hubungi</a>
-                            <small class="fw-semibold">Customer Service 24/7</small>
-                        </div>
-                        <div class="col-md-4">
-                            <i class="bi bi-lightning-charge text-warning fs-3 mb-2 d-block"></i>
-                            <small class="fw-semibold">Aktivasi Instan</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 

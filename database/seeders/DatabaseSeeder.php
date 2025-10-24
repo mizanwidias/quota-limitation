@@ -42,8 +42,7 @@ class DatabaseSeeder extends Seeder
             'cust_id'   => 'cust3',
             'cust_name' => 'Teh Ida',
             'no_hp'     => '083456789012',
-            'password'  => Hash::make('teh12345
-            '),
+            'password'  => Hash::make('teh12345'),
             'role'      => 'customer',
         ]);
 
