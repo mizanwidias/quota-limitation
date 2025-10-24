@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\GeoHelper;
+use App\Services\GenieAcs;
+use App\Services\RadacctService;
 use ClickHouseDB\Client;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -14,14 +16,56 @@ class HomeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Default tampil 1 jam terakhir
         $services = $this->fetchTopServices('h');
+        $user = auth()->user();
+
+        // ambil IP dari radius
+        $ipAddress = \App\Models\RadReply::where('username', $user->cust_id)
+            ->where('attribute', 'Framed-IP-Address')
+            ->value('value');
+
+        $group = \App\Models\RadUserGroup::where('username', $user->cust_id)
+            ->value('groupname');
+
+        // ambil filter dari GET
+        $tahun = $request->input('tahun');   // contoh: 2025
+        $bulan = $request->input('bulan');   // contoh: 9
+        $hari  = $request->input('hari');    // contoh: 6
+
+        // ambil usage & tanggal yg tersedia
+        $usage = RadacctService::getUsage($user->cust_id, $tahun, $bulan, $hari);
+        $availableDates = RadacctService::getAvailableDates($user->cust_id);
+
+        $temperature = GenieAcs::getDeviceField($user->cust_id, 'Temperature');
+        $rxPower     = GenieAcs::getDeviceField($user->cust_id, 'RXPower');
+        $uptime      = GenieAcs::getDeviceField($user->cust_id, 'Uptime');
+        $pppIp       = GenieAcs::getDeviceField($user->cust_id, 'PPPIP');
+        $ssid = GenieAcs::getDeviceSSID($user->cust_id);
+        $activeHosts = GenieAcs::getActiveHosts($user->cust_id);
+        $deviceStatus = GenieAcs::getLastInformStatus($user->cust_id);
 
         return view('home.index', [
             'title' => 'Dashboard - Hyperlink',
             'services' => $services,
+            'user'  => $user,
+            'ip'    => $ipAddress,
+            'group' => $group,
+            'usage' => $usage,
+            'availableDates' => $availableDates,
+            'tahun' => $tahun,
+            'bulan' => $bulan,
+            'hari'  => $hari,
+            'temperature' => $temperature,
+            'rxPower'     => $rxPower,
+            'uptime'      => $uptime,
+            'pppIp'       => $pppIp,
+            'ssid'        => $ssid,
+            'activeHosts' => $activeHosts,
+            'countActiveHosts' => count($activeHosts),
+            'deviceStatus' => $deviceStatus,
         ]);
     }
 
@@ -88,6 +132,27 @@ class HomeController extends Controller
             Log::error('ClickHouse query failed: ' . $e->getMessage());
             return [];
         }
+    }
+
+    public function getActiveHosts()
+    {
+        $user = auth()->user();
+
+        // 1️⃣ Panggil summon agar ONT update ke GenieACS
+        GenieAcs::summonHosts($user->cust_id);
+
+        // 2️⃣ Polling (cek berulang sampai data baru muncul)
+        $hosts = [];
+        for ($i = 0; $i < 5; $i++) { // 5 kali percobaan (sekitar 5 detik total)
+            sleep(1); // tunggu 1 detik tiap loop
+            $hosts = GenieAcs::getActiveHosts($user->cust_id);
+            if (count($hosts) > 0) break; // kalau udah ada data, stop
+        }
+
+        return response()->json([
+            'hosts' => $hosts,
+            'count' => count($hosts)
+        ]);
     }
 
     /**
