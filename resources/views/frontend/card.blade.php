@@ -45,7 +45,7 @@
     <div class="card stat-card shadow-sm border-0">
         <div class="card-body">
             <div class="stat-label">Masa Aktif Langganan</div>
-            <h6 class="stat-value mb-2">18 Hari</h6>
+            <h6 class="stat-value mb-2">{{ $usage['uptime'] }}</h6>
             <div class="progress-custom">
                 <div class="progress-bar" role="progressbar" style="width: 60%;" aria-valuenow="60" aria-valuemin="0"
                     aria-valuemax="100"></div>
