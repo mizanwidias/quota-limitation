@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{$title}}</title>
+    <title>{{ $title }}</title>
 
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -120,7 +120,9 @@
         }
 
         @keyframes slideIn {
-            from { width: 0 !important; }
+            from {
+                width: 0 !important;
+            }
         }
 
         .progress-label {
@@ -159,9 +161,17 @@
         }
 
         @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(72, 187, 120, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(72, 187, 120, 0); }
+            0% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+            }
+
+            70% {
+                box-shadow: 0 0 0 8px rgba(72, 187, 120, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+            }
         }
 
         /* Card Container */
@@ -195,129 +205,135 @@
         }
     </style>
 </head>
+@if ($title != 'Login - Hyperlink')
 
-<body>
-    <div id="app">
-        <!-- Sidebar -->
-        <div id="sidebar" class="active">
-            <div class="sidebar-wrapper active">
-                <div class="sidebar-header">
-                    <div class="d-flex justify-content-between">
-                        <div class="logo">
-                            <a href="{{ route('home') }}"><img src="{{ asset('images/logo/hyperlink-logo.jpg') }}" alt="Logo" style="width: auto; height: 80px; object-fit: cover; margin-left: 60px; margin-top: -20px; margin-bottom: -20px"></a>
-                        </div>
-                        <div class="toggler">
-                            <a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+    <body>
+        <div id="app">
+            <!-- Sidebar -->
+            <div id="sidebar" class="active">
+                <div class="sidebar-wrapper active">
+                    <div class="sidebar-header">
+                        <div class="d-flex justify-content-between">
+                            <div class="logo">
+                                <a href="{{ route('home') }}"><img src="{{ asset('images/logo/hyperlink-logo.jpg') }}"
+                                        alt="Logo"
+                                        style="width: auto; height: 80px; object-fit: cover; margin-left: 60px; margin-top: -20px; margin-bottom: -20px"></a>
+                            </div>
+                            <div class="toggler">
+                                <a href="#" class="sidebar-hide d-xl-none d-block"><i
+                                        class="bi bi-x bi-middle"></i></a>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="sidebar-menu">
-                    <ul class="menu">
-                        <li class="sidebar-title">Menu</li>
-                
-                        <li class="sidebar-item {{ request()->routeIs('home') ? 'active' : '' }}">
-                            <a href="{{ route('home') }}" class="sidebar-link">
-                                <i class="bi bi-grid-fill"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                
-                        <li class="sidebar-item {{ request()->routeIs('kuota*') ? 'active' : '' }}">
-                            <a href="{{ route('kuota') }}" class="sidebar-link">
-                                <i class="bi bi-wifi"></i>
-                                <span>Paket Kuota Pilihan</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                
-                <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
-            </div>
-        </div>
+                    <div class="sidebar-menu">
+                        <ul class="menu">
+                            <li class="sidebar-title">Menu</li>
 
-        <!-- Main Content -->
-        <div id="main">
-            <header class="mb-3">
-                <a href="#" class="burger-btn d-block d-xl-none">
-                    <i class="bi bi-justify fs-3"></i>
-                </a>
-            </header>
+                            <li class="sidebar-item {{ request()->routeIs('home') ? 'active' : '' }}">
+                                <a href="{{ route('home') }}" class="sidebar-link">
+                                    <i class="bi bi-grid-fill"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            </li>
 
-            <div class="page-heading">
-                <h3>Profile</h3>
-            </div>
-
-            <div class="page-content">
-                <section class="row">
-                    <div class="col-12">
-                        <!-- Stats Cards -->
-                        @yield('card')
-
-                        <div class="section-divider"></div>
-
-                        <!-- Charts Section -->
-                        @yield('chart')
+                            <li class="sidebar-item {{ request()->routeIs('kuota*') ? 'active' : '' }}">
+                                <a href="{{ route('kuota') }}" class="sidebar-link">
+                                    <i class="bi bi-wifi"></i>
+                                    <span>Paket Kuota Pilihan</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                </section>
 
-                <!-- Country/Services Section -->
-                <section class="row mt-4">
-                    @yield('serviceCharts')
-                </section>
+                    <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+                </div>
+            </div>
 
-                <!-- Additional Content -->
-                @yield('content')
-                <!-- Info Banner -->
-                <div class="row mt-5">
-                    <div class="col-12">
-                        <div class="card border-0 bg-light rounded-4">
-                            <div class="card-body text-center py-4">
-                                <h5 class="fw-bold mb-3">
-                                    <i class="bi bi-info-circle text-primary me-2"></i>
-                                    Informasi Penting
-                                </h5>
-                                <div class="row g-3">
-                                    <div class="col-md-4">
-                                        <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
-                                        <small class="fw-semibold">Aman & Terpercaya</small>
-                                    </div>
-                                    <div class="col-md-4 text-center">
-                                        <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
-                                        <small class="fw-semibold d-block mb-2">Customer Service 24/7</small>
-                                        <a href="https://wa.me/6289699405414" class="btn btn-success btn-sm rounded-pill" target="_blank">
-                                            <i class="bi bi-whatsapp me-1"></i>
-                                            Chat WhatsApp
-                                        </a>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <i class="bi bi-lightning-charge text-warning fs-3 mb-2 d-block"></i>
-                                        <small class="fw-semibold">Aktivasi Instan</small>
+            <!-- Main Content -->
+            <div id="main">
+                <header class="mb-3">
+                    <a href="#" class="burger-btn d-block d-xl-none">
+                        <i class="bi bi-justify fs-3"></i>
+                    </a>
+                </header>
+
+                <div class="page-heading">
+                    <h3>Profile</h3>
+                </div>
+
+                <div class="page-content">
+                    <section class="row">
+                        <div class="col-12">
+                            <!-- Stats Cards -->
+                            @yield('card')
+
+                            <div class="section-divider"></div>
+
+                            <!-- Charts Section -->
+                            @yield('chart')
+                        </div>
+                    </section>
+
+                    <!-- Country/Services Section -->
+                    <section class="row mt-4">
+                        @yield('serviceCharts')
+                    </section>
+
+                    <!-- Additional Content -->
+                    @yield('content')
+                    <!-- Info Banner -->
+                    <div class="row mt-5">
+                        <div class="col-12">
+                            <div class="card border-0 bg-light rounded-4">
+                                <div class="card-body text-center py-4">
+                                    <h5 class="fw-bold mb-3">
+                                        <i class="bi bi-info-circle text-primary me-2"></i>
+                                        Informasi Penting
+                                    </h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
+                                            <small class="fw-semibold">Aman & Terpercaya</small>
+                                        </div>
+                                        <div class="col-md-4 text-center">
+                                            <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
+                                            <small class="fw-semibold d-block mb-2">Customer Service 24/7</small>
+                                            <a href="https://wa.me/6289699405414"
+                                                class="btn btn-success btn-sm rounded-pill" target="_blank">
+                                                <i class="bi bi-whatsapp me-1"></i>
+                                                Chat WhatsApp
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <i class="bi bi-lightning-charge text-warning fs-3 mb-2 d-block"></i>
+                                            <small class="fw-semibold">Aktivasi Instan</small>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+                <footer>
+                    <div class="footer clearfix mb-0 text-muted">
+                        <div class="float-start">
+                            <p>2025 &copy; Hyperlink</p>
+                        </div>
+                        <div class="float-end">
+                            <p>Crafted by <a href="http://hyperlink.my.id">Hyperlink</a></p>
+                        </div>
+                    </div>
+                </footer>
             </div>
-
-            <footer>
-                <div class="footer clearfix mb-0 text-muted">
-                    <div class="float-start">
-                        <p>2025 &copy; Hyperlink</p>
-                    </div>
-                    <div class="float-end">
-                        <p>Crafted by <a href="http://hyperlink.my.id">Hyperlink</a></p>
-                    </div>
-                </div>
-            </footer>
         </div>
-    </div>
 
-    <script src="{{ asset('vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('vendors/apexcharts/apexcharts.js') }}"></script>
-    <script src="{{ asset('js/pages/dashboard.js') }}"></script>
-    <script src="{{ asset('js/main.js') }}"></script>
-</body>
+        <script src="{{ asset('vendors/perfect-scrollbar/perfect-scrollbar.min.js') }}"></script>
+        <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+        <script src="{{ asset('vendors/apexcharts/apexcharts.js') }}"></script>
+        <script src="{{ asset('js/pages/dashboard.js') }}"></script>
+        <script src="{{ asset('js/main.js') }}"></script>
+    </body>
+@endif
 
 </html>

@@ -15,7 +15,7 @@ class LoginUserController extends Controller
      */
     public function login_page()
     {
-        return view('home-user.login', [
+        return view('home.login', [
             'title' => 'Login - Hyperlink'
         ]);
     }
@@ -51,7 +51,7 @@ class LoginUserController extends Controller
             case 'pemilik':
                 return redirect()->route('login_page')->with('success', 'Login berhasil sebagai Pemilik!');
             default:
-                return redirect()->route('home-user')->with('success', 'Login berhasil sebagai Customer!');
+                return redirect()->route('home')->with('success', 'Login berhasil sebagai Customer!');
         }
     }
 
