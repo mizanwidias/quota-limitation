@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GenieAcs;
 use App\Services\RadacctService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -48,13 +49,15 @@ class KuotaController extends Controller
         return $pakets;
     }
 
-    public function index()
+    public function index(Request $request, $tahun = null, $bulan = null, $hari = null)
     {
+        $user = auth()->user();
         $pakets = $this->getPaketsFromRadius();
 
         $username = auth()->user()->username ?? 'demo';
         $limitKuotaGB = 50; // default kuota
-        $usage = RadacctService::getUsage($username, date('Y'), date('m'));
+        $usage = RadacctService::getUsage($user->cust_id, $tahun, $bulan, $hari);
+        $uptime      = GenieAcs::getDeviceField($user->cust_id, 'Uptime');
 
         $totalUsageGB = isset($usage['total_bytes'])
             ? round($usage['total_bytes'] / pow(1024, 3), 2)
@@ -72,11 +75,13 @@ class KuotaController extends Controller
 
         return view('paket-kuota.index', [
             'title' => 'Paket Kuota Internet',
-            'pakets' => $pakets,
             'usage' => $usage,
+            'pakets' => $pakets,
+            'user' => $user,
+            'activeGroup' => $activeGroup,
             'limit' => $limitKuotaGB,
             'persentase' => $persentase,
-            'activeGroup' => $activeGroup,
+            'uptime' => $uptime,
         ]);
     }
 
