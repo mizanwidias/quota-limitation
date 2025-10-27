@@ -79,6 +79,7 @@ class HomeController extends Controller
             'activeHosts' => $activeHosts,
             'countActiveHosts' => count($activeHosts),
             'deviceStatus' => $deviceStatus,
+            'persentase' => $persentase
         ]);
     }
 

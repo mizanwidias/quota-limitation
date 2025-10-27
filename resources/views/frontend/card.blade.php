@@ -10,7 +10,7 @@
                 <div class="flex-grow-1">
                     <div class="stat-label">Profil Pengguna</div>
                     <h6 class="stat-value mb-1">
-                        {{ $user->firstname ?? 'Unknown' }} {{ $user->lastname ?? '' }}
+                        {{ $user->cust_name ?? 'Unknown' }} {{ $user->lastname ?? '' }}
                     </h6>
                     <small class="stat-meta">
                         <i class="bi bi-person-badge"></i> {{ $user->username ?? 'N/A' }}<br>
@@ -19,7 +19,7 @@
                 </div>
             </div>
         </div>
-    </div>                            
+    </div>
 
     <!-- Uptime Card -->
     <div class="card stat-card shadow-sm border-0">
@@ -67,8 +67,8 @@
             </div>
             <div class="progress-label">
                 <span>Kapasitas</span>
-                <span class="fw-bold text-danger">{{ number_format($persentase, 1) }}% dari {{ $limit }} GB</span>
+                <span class="fw-bold text-danger">{{ number_format($persentase, 1) }}% dari {{ $limit ?? 'N/A' }} GB</span>
             </div>
         </div>
-    </div>                            
+    </div>
 </div>
