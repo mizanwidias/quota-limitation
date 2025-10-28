@@ -18,8 +18,6 @@ class HomeController extends Controller
      */
     public function index(Request $request)
     {
-        // Default tampil 1 jam terakhir dari ClickHouse
-        $services = $this->fetchTopServices('h');
         $user = auth()->user();
 
         // ambil IP dari radius
@@ -38,7 +36,6 @@ class HomeController extends Controller
         // ambil usage & tanggal yg tersedia
         $usage = RadacctService::getUsage($user->cust_id, $tahun, $bulan, $hari);
         $availableDates = RadacctService::getAvailableDates($user->cust_id);
-
         $temperature = GenieAcs::getDeviceField($user->cust_id, 'Temperature');
         $rxPower     = GenieAcs::getDeviceField($user->cust_id, 'RXPower');
         $uptime      = GenieAcs::getDeviceField($user->cust_id, 'Uptime');
@@ -47,21 +44,10 @@ class HomeController extends Controller
         $activeHosts = GenieAcs::getActiveHosts($user->cust_id);
         $deviceStatus = GenieAcs::getLastInformStatus($user->cust_id);
 
-        // Ambil data kuota user dari radius
-        $username = auth()->user()->username ?? 'demo'; // sesuaikan
-        $limitKuotaGB = 800; // contoh batas kuota (bisa ambil dari DB nanti)
-
-        $usage = RadacctService::getUsage($username, date('Y'), date('m'));
-
-        // Ubah hasil pemakaian jadi GB (angka murni)
-        $totalUsageBytes = self::toBytes($usage['total']);
-        $totalUsageGB = round($totalUsageBytes / pow(1024, 3), 2);
-
-        // Hitung persentase
-        $persentase = min(($totalUsageGB / $limitKuotaGB) * 100, 100);
+        $services = $this->fetchTopServices('h');
 
         return view('home.index', [
-            'title' => 'Dashboard - Hyperlink',
+            'title' => 'Client - Hyperlink',
             'services' => $services,
             'user'  => $user,
             'ip'    => $ipAddress,

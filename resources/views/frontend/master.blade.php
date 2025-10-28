@@ -298,7 +298,7 @@
                                         <div class="col-md-4 text-center">
                                             <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
                                             <small class="fw-semibold d-block mb-2">Customer Service 24/7</small>
-                                            <a href="https://wa.me/6289699405414"
+                                            <a href="https://wa.me/6289699405414?text=Halo%2C%20Mimin%20Hyperlink%0ASaya%20ingin%20bertanya%20tentang%20layanan%20Hyperlink.%0AMohon%20bantuannya%20yaa%20mimin"
                                                 class="btn btn-success btn-sm rounded-pill" target="_blank">
                                                 <i class="bi bi-whatsapp me-1"></i>
                                                 Chat WhatsApp
