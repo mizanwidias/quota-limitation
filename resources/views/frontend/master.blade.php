@@ -208,6 +208,7 @@
 @if ($title != 'Login - Hyperlink')
 
     <body>
+        @include('components.toast')
         <div id="app">
             <!-- Sidebar -->
             <div id="sidebar" class="active">
@@ -281,38 +282,6 @@
 
                     <!-- Additional Content -->
                     @yield('content')
-                    <!-- Info Banner -->
-                    <div class="row mt-5">
-                        <div class="col-12">
-                            <div class="card border-0 bg-light rounded-4">
-                                <div class="card-body text-center py-4">
-                                    <h5 class="fw-bold mb-3">
-                                        <i class="bi bi-info-circle text-primary me-2"></i>
-                                        Informasi Penting
-                                    </h5>
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <i class="bi bi-shield-check text-success fs-3 mb-2 d-block"></i>
-                                            <small class="fw-semibold">Aman & Terpercaya</small>
-                                        </div>
-                                        <div class="col-md-4 text-center">
-                                            <i class="bi bi-headset text-primary fs-3 mb-2 d-block"></i>
-                                            <small class="fw-semibold d-block mb-2">Customer Service 24/7</small>
-                                            <a href="https://wa.me/6289699405414?text=Halo%2C%20Mimin%20Hyperlink%0ASaya%20ingin%20bertanya%20tentang%20layanan%20Hyperlink.%0AMohon%20bantuannya%20yaa%20mimin"
-                                                class="btn btn-success btn-sm rounded-pill" target="_blank">
-                                                <i class="bi bi-whatsapp me-1"></i>
-                                                Chat WhatsApp
-                                            </a>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <i class="bi bi-lightning-charge text-warning fs-3 mb-2 d-block"></i>
-                                            <small class="fw-semibold">Aktivasi Instan</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
 
                 <footer>

@@ -60,6 +60,7 @@
         </div>
 
     </div>
+    @include('components.toast')
 </body>
 
 </html>
